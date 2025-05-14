@@ -108,6 +108,7 @@
                                         <li class="size-option" style="background-color: #f6f6f6; pointer-events: none; color: #dedddd; ">
                                             <input class="size" type="radio" name="size" data-size="@item.SizeId" value="@item.SizeId" style="width:100%;" hidden>@item.SizeName
                                         </li>
+
                                     }
                                     else
                                     {
@@ -124,6 +125,24 @@
                                                 <input class="size" type="radio" name="size" data-size="@item.SizeId" value="@item.SizeId" style="width:100%;" hidden>@item.SizeName
                                             </li>
                                         }
+                                    }
+                                }
+                            </ul>
+                            <ul>                          
+                                @foreach (var item in sizestock)
+                                {
+                                    if (item.Stock == 0)
+                                    {
+                                        <li class="size-option" style="background-color: #f6f6f6; pointer-events: none; color: black; ">
+                                            
+                                            <div class="stock-info" style="font-size: 12px;">Còn:0</div>
+                                        </li>
+                                    }
+                                    else
+                                    {
+                                        <li class="size-option"  style="background-color: #f6f6f6; pointer-events: none; color: black; ">
+                                            <div class="stock-info" style="font-size: 12px;">Còn:@item.Stock</div>
+                                        </li>
                                     }
                                 }
                             </ul>
