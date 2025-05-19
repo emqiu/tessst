@@ -1,4 +1,5 @@
-﻿var cart = {
+﻿
+var cart = {
     init: function () {
         cart.regEvents();
     },
@@ -71,6 +72,9 @@
                 });
             }
         });
+        
+        
+
     }
 }
 cart.init();

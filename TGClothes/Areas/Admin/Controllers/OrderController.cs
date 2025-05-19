@@ -1,6 +1,9 @@
 ﻿using Common;
+using Data.EF;
 using Data.Services;
+using PagedList;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
 using TGClothes.Models;
@@ -29,20 +32,72 @@ namespace TGClothes.Areas.Admin.Controllers
         }
         // GET: Admin/Order
 
-        public ActionResult Index(DateTime? fromDate, DateTime? toDate, int page = 1, int pageSize = 8)
+        public ActionResult Index(DateTime? fromDate, DateTime? toDate, int? statusFilter, int page = 1, int pageSize = 8 )
         {
-            if (!fromDate.HasValue && !toDate.HasValue)
+            //if (!fromDate.HasValue && !toDate.HasValue)
+            //{
+            //    var model = _orderService.GetAllPaging(page, pageSize);
+            //    return View(model);
+            //}
+            //else
+            //{
+            //    var model = _orderService.GetAllByDatePaging(fromDate.Value, toDate.Value, page, pageSize);
+            //    ViewBag.FromDate = fromDate;
+            //    ViewBag.ToDate = toDate;
+            //    return View(model);
+            //}
+
+            ViewBag.FromDate = fromDate;
+            ViewBag.ToDate = toDate;
+            ViewBag.StatusFilter = statusFilter;
+
+            IEnumerable<Order> query;
+
+            if (!fromDate.HasValue || !toDate.HasValue)
             {
-                var model = _orderService.GetAllPaging(page, pageSize);
-                return View(model);
+                query = _orderService.GetAllPaging(); // ✅ Không truyền page/pageSize
             }
             else
             {
-                var model = _orderService.GetAllByDatePaging(fromDate.Value, toDate.Value, page, pageSize);
-                ViewBag.FromDate = fromDate;
-                ViewBag.ToDate = toDate;
-                return View(model);
+                query = _orderService.GetAllByDatePaging(fromDate.Value, toDate.Value); // ✅
             }
+
+            if (statusFilter.HasValue)
+            {
+                //if (statusFilter.Value == (int)OrderStatus.SUCCESSFUL)
+                //{
+                //    query = query.Where(o => o.Status == (int)OrderStatus.SUCCESSFUL);
+                //}
+                //else
+                //{
+                //    query = query.Where(o => o.Status != (int)OrderStatus.SUCCESSFUL);
+                //}
+                switch (statusFilter.Value)
+                {
+                    case (int)OrderStatus.SUCCESSFUL:
+                        query = query.Where(o => o.Status == (int)OrderStatus.SUCCESSFUL);
+                        break;
+
+                    case (int)OrderStatus.CANCELLED:
+                        query = query.Where(o => o.Status == (int)OrderStatus.CANCELLED);
+                        break;
+
+                    case -1: // Đơn đang thực hiện
+                        query = query.Where(o =>
+                            o.Status == (int)OrderStatus.PENDING ||
+                            o.Status == (int)OrderStatus.PROCESSING ||
+                            o.Status == (int)OrderStatus.TRANSPORTING);
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+
+            var model = query.OrderByDescending(x => x.OrderDate)
+                             .ToPagedList(page, pageSize); // ✅ Phân trang tại đây
+
+            return View(model);
         }
 
         public ActionResult Details(long id)
@@ -111,5 +166,60 @@ namespace TGClothes.Areas.Admin.Controllers
             return this.Edit(id);
 
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public JsonResult UpdateStatus(int id, int status)
+        {
+            try
+            {
+                var order = _orderService.GetOrderById(id);
+                if (order == null)
+                    return Json(new { success = false, message = "Đơn hàng không tồn tại." });
+
+                order.Status = status;
+
+                // ← Thêm 2 dòng này để lưu ngày giao khi chuyển sang SUCCESSFUL
+                if (status == (int)OrderStatus.SUCCESSFUL)
+                    order.DeliveryDate = DateTime.Now;
+                else
+                    order.DeliveryDate = null;
+
+                _orderService.Update(order);
+
+                
+
+                return Json(new
+                {
+                    success = true,
+                    deliveryDate = order.DeliveryDate?.ToString("dd/MM/yyyy HH:mm:ss")
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+        //[HttpGet]
+        //public JsonResult GetDeliveryDate(long id)
+        //{
+        //    try
+        //    {
+        //        var order = _orderService.GetOrderById(id);
+        //        if (order == null)
+        //            return Json(new { success = false, message = "Đơn hàng không tồn tại." }, JsonRequestBehavior.AllowGet);
+
+        //        var deliveryDate = order.DeliveryDate.HasValue
+        //            ? order.DeliveryDate.Value.ToString("dd/MM/yyyy HH:mm:ss")
+        //            : "";
+
+        //        return Json(new { success = true, deliveryDate }, JsonRequestBehavior.AllowGet);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
+        //    }
+        //}
+
     }
 }

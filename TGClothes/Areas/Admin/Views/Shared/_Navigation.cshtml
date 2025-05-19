@@ -15,7 +15,7 @@
     <li class="nav-item">
         <a class="nav-link" href="/Admin/Home/Index">
             <i class="fas fa-fw fa-tachometer-alt"></i>
-            <span>Nguyễn Văn Quý</span>
+            <span>Dashboard</span>
         </a>
     </li>
 
@@ -55,9 +55,17 @@
                 <a class="collapse-item" href="/Admin/Product/Index">Quản lý Sản phẩm</a>
                 <a class="collapse-item" href="/Admin/ProductCategory/Index">Quản lý Danh mục</a>
                 <a class="collapse-item" href="/Admin/Size/Index">Quản lý Size</a>
-                <a class="collapse-item" href="/Admin/Order/Index">Quản lý Đơn hàng</a>
+                @*<a class="collapse-item" href="/Admin/Order/Index">Quản lý Đơn hàng</a>*@
             </div>
         </div>
+    </li>
+
+    <!-- Nav Item - Utilities Collapse Menu -->
+    <li class="nav-item">
+        <a class="nav-link" href="/Admin/Order/Index">
+            <i class="fa fa-truck" aria-hidden="true"></i>
+            <span>Quản lý Đơn hàng</span>
+        </a>
     </li>
 
     <!-- Nav Item - Utilities Collapse Menu -->
@@ -90,6 +98,7 @@
                 <a class="collapse-item" href="/Admin/RevenueStatistic/OrderStatistic">Thống kê đơn hàng</a>
                 <a class="collapse-item" href="/Admin/RevenueStatistic/ProductStatistic">Thống kê sản phẩm bán ra</a>
                 <a class="collapse-item" href="/Admin/RevenueStatistic/RevenueStatistic">Thống kê doanh thu</a>
+                <a class="collapse-item" href="/Admin/RevenueStatistic/RevenueByDay">Thống kê doanh thu ngày</a>
             </div>
         </div>
     </li>
@@ -125,5 +134,5 @@
     <div class="text-center d-none d-md-inline">
         <button class="rounded-circle border-0" id="sidebarToggle"></button>
     </div>
-    
+
 </ul>

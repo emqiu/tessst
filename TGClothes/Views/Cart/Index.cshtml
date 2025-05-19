@@ -80,14 +80,18 @@
                                                 <div class="btn-num-product-down cl8 hov-btn3 trans-04 flex-c-m">
                                                     <i class="fs-16 zmdi zmdi-minus"></i>
                                                 </div>
-
-                                                <input class="mtext-104 cl3 txt-center num-product txtQuantity" type="number" data-product-id="@item.Product.Id" data-size-id="@item.Size.Id" value="@item.Quantity">
-
-                                                <div class="btn-num-product-up cl8 hov-btn3 trans-04 flex-c-m">
+                                                    <input class="mtext-104 cl3 txt-center num-product txtQuantity" type="number" data-product-id="@item.Product.Id" data-size-id="@item.Size.Id" value="@item.Quantity">
+                                        
+                                                    <div class="btn-num-product-up cl8 hov-btn3 trans-04 flex-c-m">
                                                     <i class="fs-16 zmdi zmdi-plus"></i>
                                                 </div>
                                             </div>
                                         </td>
+                                        
+
+
+
+
                                         <td class="column-5 text-center">
                                             @if (item.Product.Promotion == 0 || item.Product.Promotion == null)
                                             {
@@ -105,6 +109,9 @@
                                             }
                                         </td>
                                         <td class="column-6 text-center"><a href="#" class="btn-delete" data-product-id="@item.Product.Id" data-size-id="@item.Size.Id" style="color: #555;"><i class="fa fa-trash-o"></i></a></td>
+                                        
+                                        
+
                                     </tr>
                                 }
                             </table>

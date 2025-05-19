@@ -63,16 +63,40 @@
 
         </table>
     </div>
+    @*@foreach (var item in Model.Take(1))
+        {
+            <div class="text-right pb-4">
+                <div class="mtext-106 p-2">
+                    <span class="cl2 p-r-3">Tổng số lượng: </span>
+                    <span class="cl13">@item.TotalQuantity</span>
+                </div>
+                <div class="mtext-106 p-2">
+                    <span class="cl2 p-r-3">Tổng tiền: </span>
+                    <span class="cl13">@String.Format("{0:N0}", item.TotalPrice) đ</span>
+                </div>
+            </div>
+        }
+
+        <div style="margin-bottom:40px;">
+            <a href="@Url.Action("Index", "Order")" class="btn btn-danger">Quay lại</a>
+        </div>*@
+
     @foreach (var item in Model.Take(1))
     {
-        <div class="text-right pb-4">
-            <div class="mtext-106 p-2">
-                <span class="cl2 p-r-3">Tổng số lượng: </span> 
-                <span class="cl13">@item.TotalQuantity</span>
+        <div class="d-flex justify-content-between align-items-start pb-4">
+            <div>
+                <a href="@Url.Action("Index", "Order")" class="btn btn-danger">Quay lại</a>
             </div>
-            <div class="mtext-106 p-2">
-                <span class="cl2 p-r-3">Tổng tiền: </span>
-                <span class="cl13">@String.Format("{0:N0}", item.TotalPrice) đ</span>
+
+            <div class="text-right">
+                <div class="mtext-106 p-2">
+                    <span class="cl2 p-r-3">Tổng số lượng: </span>
+                    <span class="cl13">@item.TotalQuantity</span>
+                </div>
+                <div class="mtext-106 p-2">
+                    <span class="cl2 p-r-3">Tổng tiền: </span>
+                    <span class="cl13">@String.Format("{0:N0}", item.TotalPrice) đ</span>
+                </div>
             </div>
         </div>
     }

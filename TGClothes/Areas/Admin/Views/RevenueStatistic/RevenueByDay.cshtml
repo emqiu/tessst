@@ -1,4 +1,5 @@
 ﻿@model IEnumerable<Data.EF.Order>
+@using Common;
 @{
     ViewBag.Title = "RevenueByDay";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
@@ -29,7 +30,8 @@
             {
                 <tr>
                     <td>@item.Name</td>
-                    <td>@item.PaymentMethod</td>
+                    @*<td>@item.PaymentMethod</td>*@
+                    <td>@Enum.GetName(typeof(PaymentMethods), item.PaymentMethod)</td>
                     <td>@item.OrderDate</td>
                     <td>@item.DeliveryDate</td>
                     <td>
@@ -51,37 +53,41 @@
         var endPageIndex = Math.Min(totalPage, currentPage + pageDisplay / 2);
 
         var link = "/RevenueStatistic/RevenueByDay?date=" + ViewBag.Date;
-<nav class="d-flex justify-content-center">
-    <ul class="pagination">
-        @if (currentPage > ViewBag.First)
-        {
-<li class="page-item"><a href="@link&page=@ViewBag.First" title="Trang đầu" class="first flex-c-m how-pagination1 trans-04 m-all-7"><i class="fa fa-angle-double-left"></i></a></li>
+        <nav class="d-flex justify-content-center">
+            <ul class="pagination">
+                @if (currentPage > ViewBag.First)
+                {
+                    <li class="page-item"><a href="@link&page=@ViewBag.First" title="Trang đầu" class="first flex-c-m how-pagination1 trans-04 m-all-7"><i class="fa fa-angle-double-left"></i></a></li>
                     <li class="page-item">
                         <a href="@link&page=@ViewBag.Prev" title="Trang trước" class="prev flex-c-m how-pagination1 trans-04 m-all-7"><i class="fa fa-angle-left"></i></a>
-                    </li>}
-        @for (int i = startPageIndex; i <= endPageIndex; i++)
-        {
-            if (currentPage == i)
-            {
+                    </li>
+}
+                @for (int i = startPageIndex; i <= endPageIndex; i++)
+                {
+                    if (currentPage == i)
+                    {
 
-<li class="page-item active"> <a href="@link&page=@i" class="flex-c-m how-pagination1 trans-04 m-all-7 active-pagination1" title="Trang @i">@i</a></li> }
+                        <li class="page-item active"> <a href="@link&page=@i" class="flex-c-m how-pagination1 trans-04 m-all-7 active-pagination1" title="Trang @i">@i</a></li>
+ }
                     else
                     {
-<li class="page-item"><a href="@link&page=@i" title="Trang @i" class="pos flex-c-m how-pagination1 trans-04 m-all-7">@i</a></li>}
+                        <li class="page-item"><a href="@link&page=@i" title="Trang @i" class="pos flex-c-m how-pagination1 trans-04 m-all-7">@i</a></li>
+}
                 }
-        @if (currentPage < totalPage)
-        {
-<li class="page-item"><a href="@link&page=@ViewBag.Next" class="next flex-c-m how-pagination1 trans-04 m-all-7" title="Trang sau"><i class="fa fa-angle-right"></i></a></li>
-                    <li class="page-item"> <a href="@link&page=@ViewBag.Last" class="last flex-c-m how-pagination1 trans-04 m-all-7" title="Trang cuối"><i class="fa fa-angle-double-right"></i></a></li>}
+                @if (currentPage < totalPage)
+                {
+                    <li class="page-item"><a href="@link&page=@ViewBag.Next" class="next flex-c-m how-pagination1 trans-04 m-all-7" title="Trang sau"><i class="fa fa-angle-right"></i></a></li>
+                    <li class="page-item"> <a href="@link&page=@ViewBag.Last" class="last flex-c-m how-pagination1 trans-04 m-all-7" title="Trang cuối"><i class="fa fa-angle-double-right"></i></a></li>
+}
 
-    </ul>
-</nav> }
-            else if (ViewBag.ToTalPage == 1)
-            {
-<span></span> }
-            else
-            {
-<span>Không có bản ghi nào</span>}
+            </ul>
+        </nav> }
+    else if (ViewBag.ToTalPage == 1)
+    {
+        <span></span> }
+    else
+    {
+        <span>Không có bản ghi nào</span>}
 </div>
 
 <div class="body padding-8" style="border: none; box-shadow: none; border-radius: none; margin-top: 10px;">

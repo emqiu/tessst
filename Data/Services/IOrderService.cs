@@ -12,8 +12,8 @@ namespace Data.Services
         long Insert(Order order);
         bool Update(Order order);
         List<Order> GetAll();
-        IEnumerable<Order> GetAllPaging(int page, int pageSize);
-        IEnumerable<Order> GetAllByDatePaging(DateTime fromDate, DateTime toDate, int page, int pageSize);
+        IEnumerable<Order> GetAllPaging(); /*int page, int pageSize*/
+        IEnumerable<Order> GetAllByDatePaging(DateTime fromDate, DateTime toDate); /*, int page, int pageSize*/
         Order GetOrderById(long id);
         List<Order> GetOrderByUserId(long userId);
         bool Delete(long id);

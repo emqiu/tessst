@@ -36,11 +36,11 @@ namespace Data.Services.ServiceImpl
             return db.Orders.ToList();
         }
 
-        public IEnumerable<Order> GetAllByDatePaging(DateTime fromDate, DateTime toDate, int page, int pageSize)
+        public IEnumerable<Order> GetAllByDatePaging(DateTime fromDate, DateTime toDate) /*, int page, int pageSize*/
         {
             IQueryable<Order> model = db.Orders;
             var data = model.OrderByDescending(x => x.OrderDate).ToList();
-            return data.Where(x => x.OrderDate.Date >= fromDate && x.OrderDate.Date <= toDate).ToPagedList(page, pageSize);
+            return data.Where(x => x.OrderDate.Date >= fromDate && x.OrderDate.Date <= toDate)/*.ToPagedList(page, pageSize)*/;
         }
 
         public List<Order> GetAllOrderByDate(DateTime orderDate, ref int totalRecord, int pageIndex = 1, int pageSize = 8)
@@ -61,10 +61,10 @@ namespace Data.Services.ServiceImpl
             return data.OrderByDescending(x => x.OrderDate).ToList();
         }
 
-        public IEnumerable<Order> GetAllPaging(int page, int pageSize)
+        public IEnumerable<Order> GetAllPaging() /*int page, int pageSize*/
         {
             IQueryable<Order> model = db.Orders;
-            return model.OrderByDescending(x => x.OrderDate).ToPagedList(page, pageSize);
+            return model.OrderByDescending(x => x.OrderDate)/*.ToPagedList(page, pageSize)*/;
         }
 
         public Order GetOrderById(long id)

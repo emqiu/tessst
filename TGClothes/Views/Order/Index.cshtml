@@ -21,13 +21,13 @@
                 foreach (var item in Model)
                 {
                     <tr class="mtext-107">
-                        <td>
+                        <td class="text-center">
                             @Html.DisplayFor(modelItem => item.Id)
                         </td>
-                        <td>
+                        <td class="text-center">
                             @Enum.GetName(typeof(PaymentMethods), item.PaymentMethod)
                         </td>
-                        <td>
+                        <td class="text-center">
                             @if (item.Status == (int)OrderStatus.PENDING)
                             {
                                 <div style="color: #007bff;">Chờ xử lý</div>

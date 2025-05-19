@@ -645,6 +645,7 @@
     <Content Include="Assets\Admin\js\demo\chart-bar-demo.js" />
     <Content Include="Assets\Admin\js\demo\chart-pie-demo.js" />
     <Content Include="Assets\Admin\js\demo\datatables-demo.js" />
+    <Content Include="Assets\Admin\js\printThis.js" />
     <Content Include="Assets\Admin\plugin\ckeditor\adapters\jquery.js" />
     <Content Include="Assets\Admin\plugin\ckeditor\build-config.js" />
     <Content Include="Assets\Admin\plugin\ckeditor\ckeditor.js" />

@@ -159,5 +159,37 @@ namespace TGClothes.Areas.Admin.Controllers
                 return View(data);
             }
         }
+
+        public ActionResult RevenueByDay(DateTime? date, int page = 1, int pageSize = 10)
+        {
+            if (!date.HasValue)
+                date = DateTime.Today;
+
+            var allOrders = _orderService
+                .GetAll()
+                .Where(o => o.Status == (int)OrderStatus.SUCCESSFUL
+                         && o.OrderDate.Year == date.Value.Year
+                         && o.OrderDate.Month == date.Value.Month
+                         && o.OrderDate.Day == date.Value.Day)
+                .OrderByDescending(o => o.OrderDate);
+
+            int totalRecord = allOrders.Count();
+
+            var pagedOrders = allOrders.ToPagedList(page, pageSize);
+
+            ViewBag.CountOfOrder = totalRecord;
+            ViewBag.Date = date.Value.ToString("yyyy-MM-dd");
+            ViewBag.Page = page;
+            ViewBag.ToTalPage = pagedOrders.PageCount;
+            ViewBag.TotalPage = pagedOrders.PageCount;
+            ViewBag.First = 1;
+            ViewBag.Last = pagedOrders.PageCount;
+            ViewBag.Prev = page > 1 ? page - 1 : 1;
+            ViewBag.Next = page < pagedOrders.PageCount ? page + 1 : pagedOrders.PageCount;
+            ViewBag.MaxPage = 5;
+
+            return View(pagedOrders);
+        }
+
     }
 }

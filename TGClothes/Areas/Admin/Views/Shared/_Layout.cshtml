@@ -58,7 +58,7 @@
                             <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                                  aria-labelledby="userDropdown">
-                                
+
                                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
                                     <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Đăng xuất
@@ -77,9 +77,9 @@
                     <h1 class="h3 mb-4 text-gray-800">@RenderSection("header", required: true)</h1>
                     @if (TempData["AlertMessage"] != null)
                     {
-        <div id="AlertBox" class="alert @TempData["AlertType"] hide">
-            @TempData["AlertMessage"]
-        </div>}
+                        <div id="AlertBox" class="alert @TempData["AlertType"] hide">
+                            @TempData["AlertMessage"]
+                        </div>}
                     @RenderBody()
                 </div>
                 <!-- /.container-fluid -->
@@ -141,6 +141,8 @@
     <script src="~/Assets/Admin/js/sb-admin-2.min.js"></script>
     @*@Scripts.Render("~/bundles/adminjs")*@
     @RenderSection("CustomJs", false)
+    @RenderSection("scripts", required: false)
+    <script src="~/Assets/Admin/vendor/jquery/jquery-3.6.0.min.js"></script>
 </body>
 
 </html>

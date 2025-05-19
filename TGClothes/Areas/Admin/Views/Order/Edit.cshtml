@@ -67,7 +67,7 @@
                 <label class="control-label col-md-2">Ngày giao</label>
                 <div class="col-md-10">
                     @*<input type="text" name="date" value="@today" readonly />*@
-                    <input type="text" name="date" value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss")" />
+                    <input type="text" name="date" value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss")" readonly />
                     @Html.ValidationMessageFor(model => model.DeliveryDate, "", new { @class = "text-danger" })
                 </div>
             </div>
