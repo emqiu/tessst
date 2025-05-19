@@ -4,11 +4,16 @@
     <link rel="stylesheet" type="text/css" href="/Assets/Client/css/main.css">
 }
 <div class="flex-w flex-l-m filter-tope-group m-tb-10">
-        <ul class="main-menu pl-0">
-    @foreach (var item in Model.Where(x => x.ParentId == null).OrderBy(x => x.DisplayOrder))
-    {
-        var child = Model.Where(x => x.ParentId == item.Id).OrderBy(x => x.Name);
-        //var parentClass = child.Count() > 0 ? "data-bs-hover=dropdown" : "";
+    <ul class="main-menu pl-0">
+        <li>
+            <a href="/san-pham/" class="stext-101 cl2 hov1 bor3 trans-04 m-r-32 m-tb-5" data-filter="*">
+                Xem tất cả
+            </a>
+        </li>
+        @foreach (var item in Model.Where(x => x.ParentId == null).OrderBy(x => x.DisplayOrder))
+        {
+            var child = Model.Where(x => x.ParentId == item.Id).OrderBy(x => x.Name);
+            //var parentClass = child.Count() > 0 ? "data-bs-hover=dropdown" : "";
             <li>
                 <a href="/san-pham/@item.MetaTitle-@item.Id" class="stext-101 cl2 hov1 bor3 trans-04 m-r-32 m-tb-5" data-filter="*">
                     @item.Name
@@ -27,14 +32,15 @@
                     </ul>
                 }
             </li>
-            
-    }
+
+        }
         <li>
             <a href="/san-pham/sale" class="stext-101 cl2 hov1 bor3 trans-04 m-r-32 m-tb-5" data-filter="*">
                 Sale
             </a>
         </li>
-        </ul>
+
+    </ul>
 </div>
 
 @section jsFooter {
