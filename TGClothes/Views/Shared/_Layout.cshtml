@@ -39,9 +39,7 @@
     <link rel="stylesheet" type="text/css" href="/Assets/Client/css/CustomDropdown.css" />
     @RenderSection("customCSS", required: false)
     <!--===============================================================================================-->
-    <!--Start of Fchat.vn-->
-    @*<script type="text/javascript" src="https://cdn.fchat.vn/assets/embed/webchat.js?id=659195da4779ed4f012c609e" async="async"></script>*@
-    <!--End of Fchat.vn-->
+    
     <!--Start of Fchat.vn-->
     <script type="text/javascript" src="https://cdn.fchat.vn/assets/embed/webchat.js?id=6821cc43fd9179567a00e83a" async="async"></script>
     <!--End of Fchat.vn-->
@@ -64,7 +62,11 @@
                     @*<a href="/" class="logo">
                         <img src="~/Assets/Client/images/icons/sex.png" />
                     </a>*@
-                    <h3>Vibe Fashion</h3>
+                    
+                    <a href="@Url.Action("Index", "Home")" class="logo" style="text-decoration: none; color: inherit;">
+                        <h3>VIBE FASHION</h3>
+                    </a>
+
 
                     <!-- Menu desktop -->
                     <div class="menu-desktop">
