@@ -221,5 +221,36 @@ namespace TGClothes.Areas.Admin.Controllers
         //    }
         //}
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public JsonResult BulkUpdateStatus(List<int> ids, int status)
+        {
+            try
+            {
+                foreach (var id in ids)
+                {
+                    var order = _orderService.GetOrderById(id);
+                    if (order == null)
+                        continue;
+
+                    order.Status = status;
+                    // Nếu đánh dấu thành công thì lưu ngày giao
+                    if (status == (int)OrderStatus.SUCCESSFUL)
+                        order.DeliveryDate = DateTime.Now;
+                    else
+                        order.DeliveryDate = null;
+
+                    _orderService.Update(order);
+                }
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+
     }
 }

@@ -91,13 +91,14 @@
 </div>
 
 <div class="body padding-8" style="border: none; box-shadow: none; border-radius: none; margin-top: 10px;">
-    <div>
-        <button id="Print" class="btn btn-primary">Print</button>
-    </div>
+    @*<div>
+            <button id="Print" class="btn btn-primary">Print</button>
+        </div>*@
 
     <div class="mt-2">
-        @Html.ActionLink("Quay lại", "Index")
+        @Html.ActionLink("Quay lại", "Index", null, new { @class = "btn btn-danger" })
     </div>
+
 </div>
 
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>

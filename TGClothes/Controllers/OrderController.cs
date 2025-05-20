@@ -2,6 +2,7 @@
 using Data.EF;
 using Data.Services;
 using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
@@ -121,5 +122,10 @@ namespace TGClothes.Controllers
 
             return RedirectToAction("Detail", "Product", new { id = productId });
         }
+
+        
+
+        
+
     }
 }

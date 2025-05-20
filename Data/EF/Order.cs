@@ -32,5 +32,9 @@ namespace Data.EF
 
         [StringLength(50)]
         public string Phone { get; set; }
+
+        [StringLength(50)]
+        public string OrderCode { get; set; }
+
     }
 }

@@ -197,10 +197,13 @@ namespace TGClothes.Controllers
             order.Status = (int)OrderStatus.PENDING;
             order.PaymentMethod = (int)PaymentMethods.COD;
 
+            //Sinh mã đơn hàng
+            order.OrderCode = _orderService.GenerateOrderCode();
+
             var id = _orderService.Insert(order);
             var cart = (List<CartItem>)Session[CommonConstants.CART_SESSION];
             foreach (var item in cart)
-            {
+            {        
                 var orderDetail = new OrderDetail();
                 orderDetail.ProductId = item.Product.Id;
                 orderDetail.OrderId = id;
@@ -223,7 +226,7 @@ namespace TGClothes.Controllers
             content = content.Replace("{{Address}}", model.Address);
             content = content.Replace("{{Total}}", Total().ToString("N0"));
 
-            new MailHelper().SendMail(model.Email, "Đơn hàng mới từ TunaClothes", content);
+            new MailHelper().SendMail(model.Email, "Đơn hàng mới từ VibeFashion", content);
             Session[CommonConstants.CART_SESSION] = null;
             return Redirect("/hoan-thanh");
         }
@@ -248,6 +251,8 @@ namespace TGClothes.Controllers
             order.DeliveryAddress = address;
             order.Status = (int)OrderStatus.PENDING;
             order.PaymentMethod = (int)PaymentMethods.VNPAY;
+            order.OrderCode = _orderService.GenerateOrderCode();
+
 
             var id = _orderService.Insert(order);
             var cart = (List<CartItem>)Session[CommonConstants.CART_SESSION];
@@ -288,56 +293,120 @@ namespace TGClothes.Controllers
             pay.AddRequestData("vnp_OrderInfo", "Thanh toán đơn hàng"); //Thông tin mô tả nội dung thanh toán
             pay.AddRequestData("vnp_OrderType", "other"); //topup: Nạp tiền điện thoại - billpayment: Thanh toán hóa đơn - fashion: Thời trang - other: Thanh toán trực tuyến
             pay.AddRequestData("vnp_ReturnUrl", returnUrl); //URL thông báo kết quả giao dịch khi Khách hàng kết thúc thanh toán
-            pay.AddRequestData("vnp_TxnRef", order.Id.ToString()); //mã hóa đơn
+            pay.AddRequestData("vnp_TxnRef", order.OrderCode); //mã hóa đơn
             
             string paymentUrl = pay.CreateRequestUrl(url, hashSecret);
 
             return Redirect(paymentUrl);
         }
 
+        //public ActionResult PaymentConfirm()
+        //{
+        //    if (Request.QueryString.Count > 0)
+        //    {
+        //        string hashSecret = ConfigurationManager.AppSettings["HashSecret"]; //Chuỗi bí mật
+        //        var vnpayData = Request.QueryString;
+        //        VnPayLibrary pay = new VnPayLibrary();
+
+        //        //lấy toàn bộ dữ liệu được trả về
+        //        foreach (string s in vnpayData)
+        //        {
+        //            if (!string.IsNullOrEmpty(s) && s.StartsWith("vnp_") || s.StartsWith("vnp_Inv_"))
+        //            {
+        //                pay.AddResponseData(s, vnpayData[s]);
+
+        //            }
+        //        }
+
+        //        string orderCode = pay.GetResponseData("vnp_TxnRef"); //mã hóa đơn
+        //        long vnpayTranId = Convert.ToInt64(pay.GetResponseData("vnp_TransactionNo")); //mã giao dịch tại hệ thống VNPAY
+        //        string vnp_ResponseCode = pay.GetResponseData("vnp_ResponseCode"); //response code: 00 - thành công, khác 00 - xem thêm https://sandbox.vnpayment.vn/apis/docs/bang-ma-loi/
+        //        string vnp_SecureHash = Request.QueryString["vnp_SecureHash"]; //hash của dữ liệu trả về
+
+        //        bool checkSignature = pay.ValidateSignature(vnp_SecureHash, hashSecret); //check chữ ký đúng hay không?
+
+        //        if (checkSignature)
+        //        {
+        //            if (vnp_ResponseCode == "00")
+        //            {
+        //                Session[CommonConstants.CART_SESSION] = null;
+        //                return Redirect("/hoan-thanh");
+        //            }
+        //            else
+        //            {
+        //                var order = _orderService.GetByOrderCode(orderCode);
+        //                var orderDetail = _orderDetailService.GetOrderDetailByOrderId(order.Id);
+        //                foreach (var item in orderDetail)
+        //                {
+        //                    _orderDetailService.Delete(item);
+        //                }
+        //                _orderService.Delete(order.Id);
+        //                //Thanh toán không thành công. Mã lỗi: vnp_ResponseCode
+        //                TempData["PaymentFailure"] = "Có lỗi xảy ra trong quá trình xử lý hóa đơn " + orderCode + " | Mã giao dịch: " + vnpayTranId + " | Mã lỗi: " + vnp_ResponseCode;
+        //                return RedirectToAction("OrderFailure");
+        //            }
+        //        }
+        //        else
+        //        {
+        //            TempData["PaymentFailure"] = "Có lỗi xảy ra trong quá trình xử lý";
+        //            return Redirect("/that-bai");
+        //        }
+        //    }
+
+        //    return View();
+        //}
+
         public ActionResult PaymentConfirm()
         {
             if (Request.QueryString.Count > 0)
             {
-                string hashSecret = ConfigurationManager.AppSettings["HashSecret"]; //Chuỗi bí mật
+                string hashSecret = ConfigurationManager.AppSettings["HashSecret"]; // Chuỗi bí mật
                 var vnpayData = Request.QueryString;
                 VnPayLibrary pay = new VnPayLibrary();
 
-                //lấy toàn bộ dữ liệu được trả về
+                // Lấy toàn bộ dữ liệu được trả về
                 foreach (string s in vnpayData)
                 {
-                    if (!string.IsNullOrEmpty(s) && s.StartsWith("vnp_") || s.StartsWith("vnp_Inv_"))
+                    if (!string.IsNullOrEmpty(s) && (s.StartsWith("vnp_") || s.StartsWith("vnp_Inv_")))
                     {
                         pay.AddResponseData(s, vnpayData[s]);
-
                     }
                 }
 
-                long orderId = Convert.ToInt64(pay.GetResponseData("vnp_TxnRef")); //mã hóa đơn
-                long vnpayTranId = Convert.ToInt64(pay.GetResponseData("vnp_TransactionNo")); //mã giao dịch tại hệ thống VNPAY
-                string vnp_ResponseCode = pay.GetResponseData("vnp_ResponseCode"); //response code: 00 - thành công, khác 00 - xem thêm https://sandbox.vnpayment.vn/apis/docs/bang-ma-loi/
-                string vnp_SecureHash = Request.QueryString["vnp_SecureHash"]; //hash của dữ liệu trả về
+                string orderCode = pay.GetResponseData("vnp_TxnRef"); // mã đơn hàng (OrderCode kiểu string)
+                long vnpayTranId = Convert.ToInt64(pay.GetResponseData("vnp_TransactionNo")); // mã giao dịch tại hệ thống VNPAY
+                string vnp_ResponseCode = pay.GetResponseData("vnp_ResponseCode"); // mã phản hồi: "00" là thành công
+                string vnp_SecureHash = Request.QueryString["vnp_SecureHash"]; // hash để xác thực
 
-                bool checkSignature = pay.ValidateSignature(vnp_SecureHash, hashSecret); //check chữ ký đúng hay không?
+                bool checkSignature = pay.ValidateSignature(vnp_SecureHash, hashSecret); // kiểm tra chữ ký
 
                 if (checkSignature)
                 {
+                    var order = _orderService.GetByOrderCode(orderCode); // Lấy order theo mã đơn hàng
+                    if (order == null)
+                    {
+                        TempData["PaymentFailure"] = "Không tìm thấy đơn hàng với mã: " + orderCode;
+                        return Redirect("/that-bai");
+                    }
+
                     if (vnp_ResponseCode == "00")
                     {
+                        // Giao dịch thành công
                         Session[CommonConstants.CART_SESSION] = null;
                         return Redirect("/hoan-thanh");
                     }
                     else
                     {
-                        var order = _orderService.GetOrderById(orderId);
-                        var orderDetail = _orderDetailService.GetOrderDetailByOrderId(order.Id);
-                        foreach (var item in orderDetail)
+                        // Giao dịch thất bại, xóa đơn hàng
+                        var orderDetails = _orderDetailService.GetOrderDetailByOrderId(order.Id);
+                        foreach (var item in orderDetails)
                         {
                             _orderDetailService.Delete(item);
                         }
+
                         _orderService.Delete(order.Id);
-                        //Thanh toán không thành công. Mã lỗi: vnp_ResponseCode
-                        TempData["PaymentFailure"] = "Có lỗi xảy ra trong quá trình xử lý hóa đơn " + orderId + " | Mã giao dịch: " + vnpayTranId + " | Mã lỗi: " + vnp_ResponseCode;
+                        TempData["PaymentFailure"] = "Có lỗi xảy ra trong quá trình xử lý hóa đơn " + orderCode +
+                            " | Mã giao dịch: " + vnpayTranId + " | Mã lỗi: " + vnp_ResponseCode;
                         return RedirectToAction("OrderFailure");
                     }
                 }
@@ -350,6 +419,8 @@ namespace TGClothes.Controllers
 
             return View();
         }
+
+
         #endregion
 
         public ActionResult OrderSuccess()

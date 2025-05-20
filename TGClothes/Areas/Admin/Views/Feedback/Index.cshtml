@@ -36,14 +36,24 @@
                                 <td>@item.Content</td>
                                 <td>@item.CreatedDate</td>
                                 <td>
-                                    <a href="@Url.Action("Delete", "Feedback", new { id = item.Id })"
-                                       class="btn text-primary f1"
-                                       data-ajax="true"
-                                       data-ajax-method="delete"
-                                       data-ajax-confirm="Bạn có muốn xóa bản ghi này?"
-                                       data-ajax-complete="false">
+                                    @*<a href="@Url.Action("Delete", "Feedback", new { id = item.Id })"
+                                           class="btn text-primary f1"
+                                           data-ajax="true"
+                                           data-ajax-method="delete"
+                                           data-ajax-confirm="Bạn có muốn xóa bản ghi này?"
+                                           data-ajax-complete="false">
+
+                                            <i class='fa-solid fa-trash-can'></i>
+                                        </a>*@
+
+                                    
+
+                                    <a href="javascript:void(0);"
+                                       class="btn text-primary btn-delete-feedback"
+                                       data-id="@item.Id">
                                         <i class='fa-solid fa-trash-can'></i>
                                     </a>
+
                                 </td>
                             </tr>
                         }
@@ -53,3 +63,33 @@
         </div>
     </div>
 </div>
+
+@section scripts {
+    <script>
+        $(document).on("click", ".btn-delete-feedback", function () {
+            if (!confirm("Bạn có muốn xóa bản ghi này?")) return;
+
+            var button = $(this);
+            var id = button.data("id");
+
+            $.ajax({
+                url: '@Url.Action("Delete", "Feedback")',
+                type: 'POST',
+                data: { id: id },
+                success: function (response) {
+                    if (response.success) {
+                        // Xóa hàng tương ứng
+                        button.closest("tr").fadeOut(300, function () {
+                            $(this).remove();
+                        });
+                    } else {
+                        alert("Xoá thất bại.");
+                    }
+                },
+                error: function () {
+                    alert("Đã có lỗi xảy ra.");
+                }
+            });
+        });
+    </script>
+}

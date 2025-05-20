@@ -23,11 +23,19 @@ namespace TGClothes.Areas.Admin.Controllers
             return View(model);
         }
 
-        [HttpDelete]
-        public ActionResult Delete(long id)
+        //[HttpDelete]
+        //public ActionResult Delete(long id)
+        //{
+        //    _feedbackService.Delete(id);
+        //    return RedirectToAction("Index");
+        //}
+
+        [HttpPost]
+        public JsonResult Delete(long id)
         {
-            _feedbackService.Delete(id);
-            return RedirectToAction("Index");
+            var result = _feedbackService.Delete(id);
+            return Json(new { success = result });
         }
+
     }
 }

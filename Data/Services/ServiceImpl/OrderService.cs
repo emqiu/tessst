@@ -60,6 +60,16 @@ namespace Data.Services.ServiceImpl
             totalRecord = data.Count();
             return data.OrderByDescending(x => x.OrderDate).ToList();
         }
+        //vừa thêm hàm lấy đơn hàng theo ngày không lọc trạng thái
+        public List<Order> GetOrdersByExactDate(DateTime orderDate)
+        {
+            return db.Orders
+                .Where(o => o.OrderDate.Year == orderDate.Year
+                         && o.OrderDate.Month == orderDate.Month
+                         && o.OrderDate.Day == orderDate.Day)
+                .ToList();
+        }
+
 
         public IEnumerable<Order> GetAllPaging() /*int page, int pageSize*/
         {
@@ -70,6 +80,12 @@ namespace Data.Services.ServiceImpl
         public Order GetOrderById(long id)
         {
             return db.Orders.FirstOrDefault(x => x.Id == id);
+        }
+
+        public Order GetByOrderCode(string orderCode)
+        {
+            return db.Orders
+                     .FirstOrDefault(o => o.OrderCode == orderCode);
         }
 
         public List<Order> GetOrderByUserId(long userId)
@@ -113,6 +129,32 @@ namespace Data.Services.ServiceImpl
             {
                 return false;
             }
+        }
+
+        public string GenerateOrderCode()
+        {
+            var today = DateTime.Now.Date;
+            var todayOrders = db.Orders.Where(o => o.OrderDate >= today).ToList();
+
+            string datePart = today.ToString("yyddMM");
+            int maxNumber = 0;
+
+            foreach (var order in todayOrders)
+            {
+                string code = order.OrderCode;
+                if (!string.IsNullOrEmpty(code) && code.StartsWith(datePart + "DH"))
+                {
+                    string numberPart = code.Substring((datePart + "DH").Length);
+                    if (int.TryParse(numberPart, out int number))
+                    {
+                        if (number > maxNumber)
+                            maxNumber = number;
+                    }
+                }
+            }
+
+            int newNumber = maxNumber + 1;
+            return $"{datePart}DH{newNumber.ToString("D4")}";
         }
     }
 }

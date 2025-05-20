@@ -8,7 +8,22 @@
     var toDate = ViewBag.ToDate;
     var statusFilter = ViewBag.StatusFilter;
 }
+<style>
+    .dropdown:hover .dropdown-menu {
+        display: block;
+        margin-top: 0.5px; /* giữ khoảng cách dropdown với nút */
+    }
 
+    /* Tùy chọn: hiệu ứng mượt hơn */
+    .dropdown-menu {
+        display: none;
+        transition: all 0.3s ease;
+    }
+    .approve-option {
+        cursor: pointer;
+    }
+
+</style>
 @section header {
     Danh sách đơn hàng
 }
@@ -23,31 +38,54 @@
             @Html.AntiForgeryToken()
             <div class="row form-group">
                 <div class="col-lg-12 row">
-                    <div class="col-md-12">
-                        <span>Từ ngày</span>
-                        <input type="date" name="fromDate" value="" required class="mr-2" />
-                        <span>Đến ngày</span>
-                        <input type="date" name="toDate" value="" required class="mr-2" />
-                        <button type="submit" class="btn btn-outline-success">Tìm kiếm</button>
-                        <a href="/Admin/Order/Index" class="btn btn-outline-success">Refresh</a>
+                    <div class="col-md-12 d-flex align-items-center">
+                        <span class="mr-2">Từ ngày</span>
+                        <input type="date" name="fromDate" value="" required class="form-control mr-3" style="max-width:180px;" />
+                        <span class="mr-2">Đến ngày</span>
+                        <input type="date" name="toDate" value="" required class="form-control mr-3" style="max-width:180px;" />
+                        <button type="submit" class="btn btn-outline-success mr-2">Tìm kiếm</button>
+                        <a href="/Admin/Order/Index" class="btn btn-outline-success mr-2">Refresh</a>
+
+                        <!-- Dropdown Bộ lọc -->
+                        <div class="dropdown">
+                            <button class="btn btn-primary dropdown-toggle mb-1" type="button" id="dropdownFilterButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Bộ lọc
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownFilterButton">
+                                <a class="dropdown-item text-info" href="@Url.Action("Index", new { fromDate = ViewBag.FromDate, toDate = ViewBag.ToDate, statusFilter = (int?)null })">
+                                    Tất cả đơn
+                                </a>
+                                <a class="dropdown-item text-warning" href="@Url.Action("Index", new { fromDate = ViewBag.FromDate, toDate = ViewBag.ToDate, statusFilter = -1 })">
+                                    Đơn đang thực hiện
+                                </a>
+                                <a class="dropdown-item text-success" href="@Url.Action("Index", new { fromDate = ViewBag.FromDate, toDate = ViewBag.ToDate, statusFilter = (int)OrderStatus.SUCCESSFUL })">
+                                    Đơn đã giao thành công
+                                </a>
+                                <a class="dropdown-item text-danger" href="@Url.Action("Index", new { fromDate = ViewBag.FromDate, toDate = ViewBag.ToDate, statusFilter = (int)OrderStatus.CANCELLED })">
+                                    Đơn đã hủy
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Dropdown duyệt đơn hàng -->
+                        <div class="dropdown ml-2">
+                            <button class="btn btn-success dropdown-toggle mb-1" type="button" id="bulkApproveDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Duyệt đơn hàng đã chọn
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="bulkApproveDropdown">
+                                <a class="dropdown-item approve-option" data-status="@((int)OrderStatus.PROCESSING)">Đang xử lý</a>
+                                <a class="dropdown-item approve-option" data-status="@((int)OrderStatus.TRANSPORTING)">Đang vận chuyển</a>
+                                <a class="dropdown-item approve-option" data-status="@((int)OrderStatus.SUCCESSFUL)">Giao thành công</a>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
         }
-        @*Nháp thêm nút tách bảng*@
-    <div class="mb-3">
-        <a href="@Url.Action("Index", new { fromDate = ViewBag.FromDate, toDate = ViewBag.ToDate, statusFilter = (int?)null })"
-           class="btn btn-info mr-2">Tất cả đơn</a>
 
-        <a href="@Url.Action("Index", new { fromDate = ViewBag.FromDate, toDate = ViewBag.ToDate, statusFilter = -1 })"
-           class="btn btn-warning mr-2">Đơn đang thực hiện</a>
 
-        <a href="@Url.Action("Index", new { fromDate = ViewBag.FromDate, toDate = ViewBag.ToDate, statusFilter = (int)OrderStatus.SUCCESSFUL })"
-           class="btn btn-success">Đơn đã giao thành công</a>
 
-        <a href="@Url.Action("Index", new { fromDate = ViewBag.FromDate, toDate = ViewBag.ToDate, statusFilter = (int)OrderStatus.CANCELLED })"
-           class="btn btn-danger">Đơn đã hủy</a>
-    </div>
 
 
 
@@ -58,6 +96,8 @@
                         <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                             <thead>
                                 <tr>
+                                    @*thêm checkbox để duyệt nhiều đơn *@
+                                    <th><input type="checkbox" id="checkAll" /></th>
                                     <th class="text-center">Mã hóa đơn</th>
                                     <th class="text-center">Tên khách hàng</th>
                                     <th class="text-center">Hình thức thanh toán</th>
@@ -71,70 +111,77 @@
                                 @foreach (var item in Model)
                                 {
                                     <tr id="row_@item.Id">
-                                        <td class="text-center">@item.Id</td>
+                                        @*dữ liệu checkbox *@
+                                        <td class="text-center">
+                                            @if (item.Status != (int)OrderStatus.SUCCESSFUL && item.Status != (int)OrderStatus.CANCELLED)
+                                            {
+                                                <input type="checkbox" class="order-checkbox" value="@item.Id" />
+                                            }
+                                        </td>
+                                        <td class="text-center">@item.OrderCode</td>
                                         <td class="text-center">@item.Name</td>
                                         <td class="text-center">@Enum.GetName(typeof(PaymentMethods), item.PaymentMethod)</td>
 
 
                                         @*<td>
-                                            @if (item.Status == (int)OrderStatus.PENDING)
+                                                @if (item.Status == (int)OrderStatus.PENDING)
+                                                {
+                                                    <div style="color: #007bff;">Chờ xử lý</div>
+                                                }
+                                                else if (item.Status == (int)OrderStatus.PROCESSING)
+                                                {
+                                                    <div style="color: orange;">Đang xử lý</div>
+                                                }
+                                                else if (item.Status == (int)OrderStatus.TRANSPORTING)
+                                                {
+                                                    <div style="color: forestgreen;">Đang vận chuyển</div>
+                                                }
+                                                else if (item.Status == (int)OrderStatus.SUCCESSFUL)
+                                                {
+                                                    <div style="color: green;">Giao thành công</div>
+                                                }
+                                                else if (item.Status == (int)OrderStatus.CANCELLED)
+                                                {
+                                                    <div style="color: red;">Đã hủy</div>
+                                                }
+                                            </td>*@
+
+                                        @*<td>
+                                                <select class="form-control form-control-sm status-dropdown"
+                                                        data-order-id="@item.Id">
+                                                    @foreach (OrderStatus st in Enum.GetValues(typeof(OrderStatus)))
+                                                    {
+                                                        <option value="@((int)st)"
+                                                                @(item.Status == (int)st ? "selected" : "")>
+                                                            @st.GetDisplayName()
+                                                        </option>
+                                                    }
+                                                </select>
+                                            </td>*@
+
+                                        <td>
+                                            @if (item.Status == (int)OrderStatus.SUCCESSFUL)
                                             {
-                                                <div style="color: #007bff;">Chờ xử lý</div>
-                                            }
-                                            else if (item.Status == (int)OrderStatus.PROCESSING)
-                                            {
-                                                <div style="color: orange;">Đang xử lý</div>
-                                            }
-                                            else if (item.Status == (int)OrderStatus.TRANSPORTING)
-                                            {
-                                                <div style="color: forestgreen;">Đang vận chuyển</div>
-                                            }
-                                            else if (item.Status == (int)OrderStatus.SUCCESSFUL)
-                                            {
-                                                <div style="color: green;">Giao thành công</div>
+                                                <div style="color: green;text-align:center;">Giao thành công </div>
                                             }
                                             else if (item.Status == (int)OrderStatus.CANCELLED)
                                             {
-                                                <div style="color: red;">Đã hủy</div>
+                                                <div style="color: red;text-align:center;">Đã hủy </div>
                                             }
-                                        </td>*@
-
-                                        @*<td>
-                                            <select class="form-control form-control-sm status-dropdown"
-                                                    data-order-id="@item.Id">
-                                                @foreach (OrderStatus st in Enum.GetValues(typeof(OrderStatus)))
-                                                {
-                                                    <option value="@((int)st)"
-                                                            @(item.Status == (int)st ? "selected" : "")>
-                                                        @st.GetDisplayName()
-                                                    </option>
-                                                }
-                                            </select>
-                                        </td>*@
-
-                                    <td>
-                                        @if (item.Status == (int)OrderStatus.SUCCESSFUL)
-                                        {                                          
-                                            <div style="color: green;text-align:center;">Giao thành công </div>
-                                        }
-                                        else if (item.Status == (int)OrderStatus.CANCELLED)
-                                        {
-                                            <div style="color: red;text-align:center;">Đã hủy </div>
-                                        }
-                                        else
-                                        {
-                                            <select class="form-control form-control-sm status-dropdown"
-                                                    data-order-id="@item.Id">
-                                                @foreach (OrderStatus st in Enum.GetValues(typeof(OrderStatus)))
-                                                {
-                                                    <option value="@((int)st)"
-                                                            @(item.Status == (int)st ? "selected" : "")>
-                                                        @st.GetDisplayName()
-                                                    </option>
-                                                }
-                                            </select>
-                                        }
-                                    </td>
+                                            else
+                                            {
+                                                <select class="form-control form-control-sm status-dropdown"
+                                                        data-order-id="@item.Id">
+                                                    @foreach (OrderStatus st in Enum.GetValues(typeof(OrderStatus)))
+                                                    {
+                                                        <option value="@((int)st)"
+                                                                @(item.Status == (int)st ? "selected" : "")>
+                                                            @st.GetDisplayName()
+                                                        </option>
+                                                    }
+                                                </select>
+                                            }
+                                        </td>
 
 
 
@@ -194,7 +241,7 @@
                             // Cập nhật ngay cột ngày giao
                             var cell = $('#row_' + orderId).find('td').eq(5);
                             cell.text(res.deliveryDate || '');
-
+                            location.reload();
                         } else {
                             alert("Lỗi: " + res.message);
                         }
@@ -206,6 +253,60 @@
             });
         });
     </script>
+
+    <script>
+    $(document).ready(function () {
+        $('#checkAll').on('change', function () {
+            $('.order-checkbox').prop('checked', this.checked);
+        });
+
+        $('.approve-option').on('click', function () {
+            const selectedStatus = $(this).data('status');
+            const selectedIds = $('.order-checkbox:checked').map(function () {
+                return $(this).val();
+            }).get();
+
+            if (selectedIds.length === 0) {
+                alert("Vui lòng chọn ít nhất một đơn hàng.");
+                return;
+            }
+
+            let confirmMsg = "Bạn có chắc muốn cập nhật " + selectedIds.length + " đơn sang trạng thái ";
+            switch (selectedStatus) {
+                case @((int)OrderStatus.PROCESSING): confirmMsg += "'Đang xử lý'?"; break;
+                case @((int)OrderStatus.TRANSPORTING): confirmMsg += "'Đang vận chuyển'?"; break;
+                case @((int)OrderStatus.SUCCESSFUL): confirmMsg += "'Giao thành công'?"; break;
+            }
+
+            if (!confirm(confirmMsg)) return;
+
+            const token = $('input[name="__RequestVerificationToken"]').val();
+
+            $.ajax({
+                url: '@Url.Action("BulkUpdateStatus", "Order", new { area = "Admin" })',
+                type: 'POST',
+                data: {
+                    __RequestVerificationToken: token,
+                    ids: selectedIds,
+                    status: selectedStatus
+                },
+                traditional: true,
+                success: function (res) {
+                    if (res.success) {
+                        alert("Cập nhật thành công!");
+                        location.reload();
+                    } else {
+                        alert("Lỗi: " + res.message);
+                    }
+                },
+                error: function () {
+                    alert("Có lỗi xảy ra khi gửi yêu cầu.");
+                }
+            });
+        });
+    });
+    </script>
+
 }
 
 
