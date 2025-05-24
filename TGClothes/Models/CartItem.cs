@@ -13,5 +13,6 @@ namespace TGClothes.Models
         public Size Size { get; set; }
         public ProductSize ProductSize { get; set; }
         public int Quantity { get; set; }
+        public int Stock { get; set; }
     }
 }

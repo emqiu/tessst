@@ -63,6 +63,7 @@
     <Compile Include="EF\Feedback.cs" />
     <Compile Include="EF\Gallery.cs" />
     <Compile Include="EF\Menu.cs" />
+    <Compile Include="EF\Message.cs" />
     <Compile Include="EF\Order.cs" />
     <Compile Include="EF\OrderDetail.cs" />
     <Compile Include="EF\Product.cs" />

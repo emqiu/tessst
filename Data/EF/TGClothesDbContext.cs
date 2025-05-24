@@ -19,6 +19,7 @@ namespace Data.EF
         public virtual DbSet<Feedback> Feedbacks { get; set; }
         public virtual DbSet<Gallery> Galleries { get; set; }
         public virtual DbSet<Menu> Menus { get; set; }
+        public virtual DbSet<Message> Messages { get; set; }
         public virtual DbSet<Order> Orders { get; set; }
         public virtual DbSet<OrderDetail> OrderDetails { get; set; }
         public virtual DbSet<Product> Products { get; set; }
@@ -28,6 +29,7 @@ namespace Data.EF
         public virtual DbSet<Size> Sizes { get; set; }
         public virtual DbSet<Slide> Slides { get; set; }
         public virtual DbSet<Tag> Tags { get; set; }
+
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -66,6 +68,15 @@ namespace Data.EF
             modelBuilder.Entity<Tag>()
                 .Property(e => e.Id)
                 .IsUnicode(false);
+
+            modelBuilder.Entity<Message>()
+                .Property(e => e.Sender)
+                .IsUnicode(false);
+
+            modelBuilder.Entity<Message>()
+                .Property(e => e.Receiver)
+                .IsUnicode(false);
+
         }
     }
 }

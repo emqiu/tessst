@@ -398,5 +398,12 @@ namespace TGClothes.Controllers
                         
             return Json(provinces, JsonRequestBehavior.AllowGet);
         }
+
+        
+
+        
+
+
+
     }
 }

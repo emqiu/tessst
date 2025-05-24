@@ -1,14 +1,42 @@
 ﻿@model TGClothes.Models.CustomerInfo
+@using Common;
+@using System.Globalization
+
 @{
     ViewBag.Title = "Payment";
     Layout = "~/Views/Shared/_Layout.cshtml";
     var subtotal = ViewBag.SubTotal;
     var promotion = ViewBag.Promotion;
+    var total = ViewBag.Total;
 }
+
+<style>
+    .custom-select {
+        border: 1px solid #e6e6e6 !important; /* giống input */
+        border-radius: 5px;
+        background-color: white;
+        color: #333;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        padding-left: 60px; /* giống input padding trái vì có icon */
+        height: 48px; /* đồng bộ chiều cao */
+        font-family: inherit;
+        font-size: 16px;
+        outline: none;
+    }
+    /*select option.placeholder-option {
+        font-size: 14px;*/ /* hoặc 0.875rem */
+    /*color: #888;*/ /* nhẹ hơn để giống placeholder */
+    /*}*/
+
+
+</style>
 
 <section class="bg0 p-t-104 p-b-116">
     <div class="container">
         <div class="row">
+            <!-- Form điền thông tin người nhận -->
             <div class="col-lg-10 col-xl-7 bor10 m-l-25 m-r--38">
                 <div class="m-lr-0-xl m-tb-30">
                     <h4 class="mtext-109 cl2 txt-center p-b-30">
@@ -17,29 +45,47 @@
                     @using (Html.BeginForm())
                     {
                         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                        <!-- Tên -->
                         <div class="bor8 m-t-20 how-pos4-parent">
                             <span class="how-pos4 pointer-none lnr lnr-user"></span>
                             @Html.TextBoxFor(model => model.Name, new { @class = "stext-111 cl2 plh3 size-116 p-l-62 p-r-30", @placeholder = "Nhập tên người nhận" })
                         </div>
                         @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger stext-111 plh3 size-116" })
 
+                        <!-- Email -->
                         <div class="bor8 m-t-20 how-pos4-parent">
                             <span class="how-pos4 pointer-none lnr lnr-envelope"></span>
                             @Html.TextBoxFor(model => model.Email, new { @class = "stext-111 cl2 plh3 size-116 p-l-62 p-r-30", @placeholder = "Nhập email" })
                         </div>
                         @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger stext-111 plh3 size-116" })
 
+                        <!-- Số điện thoại -->
                         <div class="bor8 m-t-20 how-pos4-parent">
                             <span class="how-pos4 pointer-none lnr lnr-phone-handset"></span>
-                            @Html.TextBoxFor(model => model.Phone, new { @class = "stext-111 cl2 plh3 size-116 p-l-62 p-r-30", @placeholder = "Nhập số điện thoại", @maxlength="11" })
+                            @Html.TextBoxFor(model => model.Phone, new { @class = "stext-111 cl2 plh3 size-116 p-l-62 p-r-30", @placeholder = "Nhập số điện thoại", @maxlength = "11" })
                         </div>
                         @Html.ValidationMessageFor(model => model.Phone, "", new { @class = "text-danger stext-111 plh3 size-116" })
+                        
+                       
 
+                        <!-- Tỉnh/Thành phố -->
                         <div class="bor8 m-t-20 how-pos4-parent">
                             <span class="how-pos4 pointer-none lnr lnr-map-marker"></span>
-                            @Html.TextBoxFor(model => model.Address, new { @class = "stext-111 cl2 plh3 size-116 p-l-62 p-r-30", @placeholder = "Nhập địa chỉ" })
+                            @Html.DropDownListFor(model => model.Province,
+                                new SelectList(ProvinceShippingFeeConfig.ProvinceFees.Keys),
+                                "Địa chỉ",  
+                                new
+                                    {
+                                    @id = "province", 
+                                    @class = "stext-111 cl2 plh3 size-116 p-l-62 p-r-30",
+                                    @style = "height: 45px;"
+                                })
                         </div>
-                        @Html.ValidationMessageFor(model => model.Address, "", new { @class = "text-danger stext-111 plh3 size-116" })
+                        @Html.ValidationMessageFor(model => model.Province, "", new { @class = "text-danger stext-111 plh3 size-116" })
+
+                        <!-- Hidden để gửi lên -->
+                        <input type="hidden" id="shippingFeeInput" name="ShippingFee" value="0" />
+                        
 
                         <h4 class="mtext-109 cl2 txt-center p-b-30 p-t-30">
                             Hình thức thanh toán
@@ -78,7 +124,7 @@
                         </div>
 
                         <div class="size-208 text-right">
-                            <span class="mtext-110 cl2">
+                            <span class="mtext-110 cl2 subtotal">
                                 @(subtotal.ToString("N0"))
                             </span>
                         </div>
@@ -92,7 +138,7 @@
                         </div>
 
                         <div class="size-208 text-right">
-                            <span class="mtext-110 cl2 text-danger">
+                            <span class="mtext-110 cl2 text-danger promotion">
                                 -@(promotion.ToString("N0"))
                             </span>
                         </div>
@@ -104,18 +150,20 @@
                         </div>
 
                         <div class="size-208 text-right">
-                            @if (subtotal > 1000000)
-                            {
-                                <span class="stext-112 cl2">
-                                    Miễn phí
-                                </span>
-                            }
-                            else
-                            {
-                                <span class="mtext-110 cl2 text-danger">
-                                    @(21000.ToString("N0"))
-                                </span>
-                            }
+                            @*@if (subtotal > 1000000)
+                                {
+                                    <span class="stext-112 cl2">
+                                        Miễn phí
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="mtext-110 cl2 text-danger ">
+                                        @(21000.ToString("N0"))
+                                    </span>
+                                }*@
+
+                            <span id="shippingFee">0 đ</span>
                         </div>
                     </div>
 
@@ -127,18 +175,23 @@
                         </div>
 
                         <div class="size-208 p-t-1 text-right">
-                            @if (subtotal > 1000000)
-                            {
-                                <span class="mtext-110 cl2">
-                                    @((subtotal - promotion).ToString("N0"))
-                                </span>
-                            }
-                            else
-                            {
-                                <span class="mtext-110 cl2">
-                                    @((subtotal - promotion + 21000).ToString("N0"))
-                                </span>
-                            }
+                            @*@if (subtotal > 1000000)
+        {
+            <span class="mtext-110 cl2">
+                @((subtotal - promotion).ToString("N0"))
+            </span>
+        }
+        else
+        {
+            <span class="mtext-110 cl2">
+                @((subtotal - promotion + 21000).ToString("N0"))
+            </span>
+        }*@
+
+                            @*<span id="totalPrice">@((ViewBag.SubTotal - ViewBag.Promotion).ToString("N0")) đ</span>*@
+                            <span id="totalPrice" class="total">@Convert.ToDecimal(total).ToString("N0") đ</span>
+
+
                         </div>
                     </div>
                 </div>
@@ -161,5 +214,50 @@
                 document.getElementById('confirmOrder').setAttribute("formaction", "/Cart/PaymentVnPay");
             }
         }
+    </script>
+    <script>
+    $(document).ready(function () {
+    var subTotal = parseFloat('@(ViewBag.SubTotal.ToString("F0", CultureInfo.InvariantCulture))');
+    var promotion = parseFloat('@(ViewBag.Promotion.ToString("F0", CultureInfo.InvariantCulture))');
+    var realTotal = subTotal - promotion;
+
+    if (realTotal >= 3000000) {
+        // Disable chọn tỉnh
+        $('#province').prop('disabled', false);
+        // Hiển thị miễn phí ship
+        $('#shippingFee').text('Miễn phí');
+        $('#shippingFeeInput').val(0);
+        $('#totalPrice').text(realTotal.toLocaleString('vi-VN') + ' đ');
+    } else {
+        // Cho phép chọn tỉnh, phí ship theo tỉnh
+        $('#province').prop('disabled', false);
+        $('#shippingFee').text('0 đ');
+        $('#shippingFeeInput').val(0);
+        $('#totalPrice').text(realTotal.toLocaleString('vi-VN') + ' đ');
+
+        $('#province').change(function () {
+            var selectedProvince = $(this).val();
+            if (selectedProvince) {
+                $.ajax({
+                    url: '@Url.Action("GetShippingFee", "Cart")',
+                    type: 'GET',
+                    data: { province: selectedProvince },
+                    success: function (fee) {
+                        $('#shippingFee').text(fee.toLocaleString('vi-VN') + ' đ');
+                        $('#shippingFeeInput').val(fee);
+                        var total = realTotal + fee;
+                        $('#totalPrice').text(total.toLocaleString('vi-VN') + ' đ');
+                    }
+                });
+            } else {
+                $('#shippingFee').text('0 đ');
+                $('#shippingFeeInput').val(0);
+                $('#totalPrice').text(realTotal.toLocaleString('vi-VN') + ' đ');
+            }
+        });
+    }
+});
+
+
     </script>
 }

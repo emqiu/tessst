@@ -55,23 +55,16 @@ namespace TGClothes.Areas.Admin.Controllers
 
             if (!fromDate.HasValue || !toDate.HasValue)
             {
-                query = _orderService.GetAllPaging(); // ✅ Không truyền page/pageSize
+                query = _orderService.GetAllPaging(); 
             }
             else
             {
-                query = _orderService.GetAllByDatePaging(fromDate.Value, toDate.Value); // ✅
+                query = _orderService.GetAllByDatePaging(fromDate.Value, toDate.Value); 
             }
 
             if (statusFilter.HasValue)
             {
-                //if (statusFilter.Value == (int)OrderStatus.SUCCESSFUL)
-                //{
-                //    query = query.Where(o => o.Status == (int)OrderStatus.SUCCESSFUL);
-                //}
-                //else
-                //{
-                //    query = query.Where(o => o.Status != (int)OrderStatus.SUCCESSFUL);
-                //}
+                
                 switch (statusFilter.Value)
                 {
                     case (int)OrderStatus.SUCCESSFUL:

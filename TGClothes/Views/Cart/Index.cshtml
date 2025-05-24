@@ -4,10 +4,14 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     var subtotal = ViewBag.SubTotal;
     var promotion = ViewBag.Promotion;
+    var orderValue = ViewBag.orderValue;
+    //var shippingFee = subtotal > 1000000 ? 0m : 21000m;
+    var total = subtotal - promotion /*+ shippingFee*/;
 }
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 @section jsFooter {
     <script src="/Assets/Client/js/controller/cartController.js"></script>
+    
 }
 
 <!-- breadcrumb -->
@@ -80,19 +84,29 @@
                                                 <div class="btn-num-product-down cl8 hov-btn3 trans-04 flex-c-m">
                                                     <i class="fs-16 zmdi zmdi-minus"></i>
                                                 </div>
-                                                    <input class="mtext-104 cl3 txt-center num-product txtQuantity" type="number" data-product-id="@item.Product.Id" data-size-id="@item.Size.Id" value="@item.Quantity">
-                                        
-                                                    <div class="btn-num-product-up cl8 hov-btn3 trans-04 flex-c-m">
+                                                <input class="mtext-104 cl3 txt-center num-product txtQuantity"
+                                                       type="number"
+                                                       name="quantity"
+                                                       data-product-id="@item.Product.Id"
+                                                       data-size-id="@item.Size.Id"
+                                                       data-stock="@item.Stock"
+                                                       value="@item.Quantity"
+                                                       min="1"
+                                                       max="@item.Stock" />
+
+
+
+                                                <div class="btn-num-product-up cl8 hov-btn3 trans-04 flex-c-m">
                                                     <i class="fs-16 zmdi zmdi-plus"></i>
                                                 </div>
                                             </div>
                                         </td>
-                                        
 
 
 
 
-                                        <td class="column-5 text-center">
+                                        @*Thêm row-total*@
+                                        <td class="column-5 text-center row-total">
                                             @if (item.Product.Promotion == 0 || item.Product.Promotion == null)
                                             {
                                                 <span class="stext-105 cl3">
@@ -109,16 +123,16 @@
                                             }
                                         </td>
                                         <td class="column-6 text-center"><a href="#" class="btn-delete" data-product-id="@item.Product.Id" data-size-id="@item.Size.Id" style="color: #555;"><i class="fa fa-trash-o"></i></a></td>
-                                        
-                                        
+
+
 
                                     </tr>
                                 }
                             </table>
                         </div>
 
-                        <div class="flex-w flex-sb-m bor15 p-t-18 p-b-15 p-lr-40 p-lr-15-sm">
-                            <div class="flex-w flex-m m-r-20 m-tb-5">
+                        <div class="flex-w flex-m justify-center gap-5 bor15 p-t-18 p-b-15 p-lr-40 p-lr-15-sm">
+                            <div class="flex-w flex-m m-r-20 m-tb-5" style="padding-left:85px;">
                                 <div id="btnContinue" class="flex-c-m stext-101 cl2 size-118 bg8 bor13 hov-btn3 p-lr-15 trans-04 pointer m-tb-5">
                                     Tiếp tục mua hàng
                                 </div>
@@ -128,9 +142,7 @@
                                 Xóa giỏ hàng
                             </div>
 
-                            <div id="btnUpdate" class="flex-c-m stext-101 cl2 size-119 bg8 bor13 hov-btn3 p-lr-15 trans-04 pointer m-tb-10">
-                                Cập nhật giỏ hàng
-                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -149,7 +161,7 @@
                             </div>
 
                             <div class="size-208 text-right">
-                                <span class="mtext-110 cl2">
+                                <span class="mtext-110 cl2 subtotal" data-value="@subtotal">
                                     @(subtotal.ToString("N0"))
                                 </span>
                             </div>
@@ -163,31 +175,23 @@
                             </div>
 
                             <div class="size-208 text-right">
-                                <span class="mtext-110 cl2 text-danger">
+                                <span class="mtext-110 cl2 text-danger promotion" data-value="@promotion">
                                     -@(promotion.ToString("N0"))
                                 </span>
                             </div>
 
-                            <div class="size-209">
+                            @*<div class="size-209">
                                 <span class="stext-110 cl2">
                                     Phí giao hàng:
                                 </span>
                             </div>
 
                             <div class="size-208 text-right">
-                                @if (subtotal > 1000000)
-                                {
-                                    <span class="stext-112 cl2">
-                                        Miễn phí
-                                    </span>
-                                }
-                                else
-                                {
-                                    <span class="mtext-110 cl2 text-danger">
-                                        @(21000.ToString("N0"))
-                                    </span>
-                                }
-                            </div>
+                                <span class="mtext-110 cl2 text-danger shipping" data-value="@(subtotal > 1000000 ? 0 : 21000)">
+                                    @(subtotal > 1000000 ? "Miễn phí" : 21000.ToString("N0"))
+                                </span>
+
+                            </div>*@
                         </div>
 
                         <div class="flex-w flex-t p-t-27 p-b-33">
@@ -197,19 +201,17 @@
                                 </span>
                             </div>
 
+                            @*<div class="size-208 p-t-1 text-right">
+            <span class="mtext-110 cl2 total" data-value="@((subtotal - promotion + (subtotal > 1000000 ? 0 : 21000)))">
+                @((subtotal > 1000000 ? subtotal - promotion : subtotal - promotion + 21000).ToString("N0"))
+            </span>
+
+        </div>*@
                             <div class="size-208 p-t-1 text-right">
-                                @if (subtotal > 1000000)
-                                {
-                                    <span class="mtext-110 cl2">
-                                        @((subtotal - promotion).ToString("N0"))
-                                    </span>
-                                }
-                                else
-                                {
-                                    <span class="mtext-110 cl2">
-                                        @((subtotal - promotion + 21000).ToString("N0"))
-                                    </span>
-                                }
+                                <span class="mtext-110 cl2 total" >
+                                    @((subtotal - promotion).ToString("N0"))
+                                </span>
+
                             </div>
                         </div>
 
@@ -222,6 +224,11 @@
             else
             {
                 <span class="alert alert-danger">Chưa có sản phẩm nào trong giỏ hàng</span>
+                <div class="flex-w flex-m m-r-20 m-tb-5 d-flex" style="padding-left:85px;">
+                    <div id="btnContinue" class="flex-c-m stext-101 cl2 size-118 bg8 bor13 hov-btn3 p-lr-15 trans-04 pointer m-tb-5 ms-auto ">
+                        Tiếp tục mua hàng
+                    </div>
+                </div>
             }
         </div>
     </div>

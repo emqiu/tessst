@@ -34,6 +34,7 @@ namespace TGClothes
             container.RegisterType<IOrderService, OrderService>();
             container.RegisterType<IOrderDetailService, OrderDetailService>();
             container.RegisterType<IFeedbackService, FeedbackService>();
+            
 
             // ??t Resolver m?c ??nh cho MVC DependencyResolver
             DependencyResolver.SetResolver(new UnityDependencyResolver(container));

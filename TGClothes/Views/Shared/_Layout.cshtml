@@ -60,9 +60,11 @@
 
                     <!-- Logo desktop -->
                     @*<a href="/" class="logo">
-                        <img src="~/Assets/Client/images/icons/sex.png" />
-                    </a>*@
-                    
+                            <img src="~/Assets/Client/images/icons/sex.png" />
+                        </a>*@
+
+
+
                     <a href="@Url.Action("Index", "Home")" class="logo" style="text-decoration: none; color: inherit;">
                         <h3>VIBE FASHION</h3>
                     </a>
@@ -97,6 +99,9 @@
         @RenderSection("banner", required: false)
     </div>
 
+
+
+
     <!-- Product -->
     @RenderBody()
 
@@ -115,7 +120,7 @@
 
     <!--===============================================================================================-->
     <script src="/Assets/Client/vendor/jquery/jquery-3.2.1.min.js"></script>
- 
+
     <script src="/Assets/Client/js/jquery-ui.js"></script>
     <!--===============================================================================================-->
     <script src="/Assets/Client/vendor/animsition/js/animsition.min.js"></script>
@@ -201,9 +206,18 @@
             })
         });</script>
     <!--===============================================================================================-->
+    
+    <!--===============================================================================================-->
+    
+    <!--===============================================================================================-->
     <script src="/Assets/Client/js/main.js"></script>
     <script src="/Assets/Client/js/controller/baseController.js"></script>
+    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+    <script src="~/Scripts/jquery.signalR-2.4.1.min.js"></script>
+    <script src="~/signalr/hubs"></script>
+    <script src="~/scripts/chat.js"></script>
     <!--===============================================================================================-->
     @RenderSection("jsFooter", required: false)
+    @RenderSection("Scripts", required: false) 
 </body>
 </html>

@@ -20,6 +20,11 @@ namespace Data.EF
         [StringLength(200)]
         public string DeliveryAddress { get; set; }
 
+        [StringLength(100)]
+        public string DeliveryProvince { get; set; } 
+
+        public int? ShippingFee { get; set; } 
+
         public long CustomerId { get; set; }
 
         public long Id { get; set; }
@@ -33,6 +38,7 @@ namespace Data.EF
         [StringLength(50)]
         public string Phone { get; set; }
 
+        [Required]
         [StringLength(50)]
         public string OrderCode { get; set; }
 

@@ -1,0 +1,78 @@
+﻿@{
+    Layout = null;
+    var username = ViewBag.User ?? "Khách";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Chat với VibeFashion</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        #chatPopup {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 350px;
+            display: none;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+    <button id="openChat" class="btn btn-primary">💬 Chat với VibeFashion</button>
+
+    <div id="chatPopup" class="card shadow">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <strong>Chat với VibeFashion</strong>
+            <button class="btn btn-sm btn-danger" id="closeChat">✖</button>
+        </div>
+        <div id="chatWindow" class="card-body" style="height: 300px; overflow-y: auto;"></div>
+        <div class="card-footer d-flex">
+            <input id="messageInput" class="form-control me-2" type="text" placeholder="Nhập tin nhắn..." />
+            <button id="sendBtn" class="btn btn-success">Gửi</button>
+        </div>
+    </div>
+    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+    <script src="~/Scripts/jquery.signalR-2.4.1.min.js"></script>
+    <script src="/signalr/hubs"></script>
+    <script>
+        $(function () {
+            const username = '@username';
+            $.connection.hub.qs = { user: username };
+            var chat = $.connection.chatHub;
+
+            chat.client.receiveMessage = function (from, message, timestamp) {
+                $('#chatWindow').append(`
+                    <div class="mb-2">
+                        <small><strong>[${timestamp}] ${from}:</strong><br>${message}</small>
+                    </div>
+                `).scrollTop($('#chatWindow')[0].scrollHeight);
+            };
+
+            $.connection.hub.start().done(function () {
+                $('#sendBtn').click(function () {
+                    var msg = $('#messageInput').val().trim();
+                    if (!msg) return;
+                    chat.server.sendMessageToAdmin(username, msg);
+                    $('#messageInput').val('').focus();
+                });
+
+                // Tải lịch sử tin nhắn
+                $.get('/UserChat/GetHistory', function (data) {
+                    data.forEach(msg => {
+                        $('#chatWindow').append(`
+                            <div class="mb-2">
+                                <small><strong>[${msg.Timestamp}] ${msg.Sender}:</strong><br>${msg.MessageContent}</small>
+                            </div>
+                        `);
+                    });
+                });
+            });
+
+            $('#openChat').click(() => $('#chatPopup').show());
+            $('#closeChat').click(() => $('#chatPopup').hide());
+        });
+    </script>
+</body>
+</html>

@@ -94,8 +94,14 @@
                     <span class="cl13">@item.TotalQuantity</span>
                 </div>
                 <div class="mtext-106 p-2">
+                    <span class="cl2 p-r-3">Phí vận chuyển: </span>
+                    <span class="cl13">
+                        @(item.Order.ShippingFee == 0 ? "Miễn phí" : String.Format("{0:N0} đ", item.Order.ShippingFee))
+                    </span>
+                </div>
+                <div class="mtext-106 p-2">
                     <span class="cl2 p-r-3">Tổng tiền: </span>
-                    <span class="cl13">@String.Format("{0:N0}", item.TotalPrice) đ</span>
+                    <span class="cl13">@String.Format("{0:N0}", item.TotalPrice + item.Order.ShippingFee) đ</span>
                 </div>
             </div>
         </div>

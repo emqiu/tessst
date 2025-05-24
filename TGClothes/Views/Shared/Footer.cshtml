@@ -10,32 +10,44 @@
                 <h4 class="mtext-103 cl0 p-b-30">
                     Danh mục
                 </h4>
+                <ul class="list-unstyled">
                 @foreach (var item in Model.Where(x => x.ParentId == null).OrderBy(x => x.DisplayOrder))
                 {
-                    <ul>
+                    
                         <li class="p-b-10">
                             <a href="/san-pham/@item.MetaTitle-@item.Id" class="stext-118 cl7 hov-cl1 trans-04 categoryLink" data-filter="*">
                                 @item.Name
                             </a>
                         </li>
-                    </ul>
+                    
                 }
+                    </ul>
             </div>
 
             <div class="col-sm-6 col-lg-4 p-b-50">
                 <h4 class="mtext-103 cl0 p-b-30">
                     Tin tức
                 </h4>
-                @foreach (var item in content.OrderBy(x => x.DisplayOrder))
-                {
-                    <ul>
+                @*@foreach (var item in content.OrderBy(x => x.DisplayOrder))
+        {
+            <ul>
+                <li class="p-b-10">
+                    <a href="/category/@item.Id" class="stext-118 cl7 hov-cl1 trans-04 categoryLink" data-filter="*">
+                        @item.Name
+                    </a>
+                </li>
+            </ul>
+        }*@
+                <ul class="list-unstyled">
+                    @foreach (var item in content.OrderBy(x => x.DisplayOrder))
+                    {
                         <li class="p-b-10">
                             <a href="/category/@item.Id" class="stext-118 cl7 hov-cl1 trans-04 categoryLink" data-filter="*">
                                 @item.Name
                             </a>
                         </li>
-                    </ul>
-                }
+                    }
+                </ul>
             </div>
 
             <div class="col-sm-6 col-lg-4 p-b-50">

@@ -188,7 +188,11 @@ namespace TGClothes.Areas.Admin.Controllers
             ViewBag.Next = page < pagedOrders.PageCount ? page + 1 : pagedOrders.PageCount;
             ViewBag.MaxPage = 5;
 
-            return View(pagedOrders);
+            return View("~/Areas/Admin/Views/RevenueStatistic/RevenueByDay.cshtml", pagedOrders);
+            
+
+
+
         }
 
     }

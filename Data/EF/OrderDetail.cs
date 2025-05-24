@@ -33,5 +33,14 @@ namespace Data.EF
         [Column(Order = 2)]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public long SizeId { get; set; }
+
+        [ForeignKey("OrderId")]
+        public virtual Order Order { get; set; }
+
+        [ForeignKey("ProductId")]
+        public virtual Product Product { get; set; }
+
+        [ForeignKey("SizeId")]
+        public virtual Size Size { get; set; }
     }
 }

@@ -16,7 +16,7 @@
     {
         <h5>Họ tên: @item.Order.Name</h5>
         <h5>Email: @item.Order.Email</h5>
-        <h5>Địa chỉ: @item.Order.DeliveryAddress</h5>
+        <h5>Địa chỉ: @item.Order.DeliveryProvince</h5>
         <h5>Số điện thoại: @item.Order.Phone</h5>
     }
 
@@ -67,13 +67,24 @@
                 @Html.DisplayFor(modelItem => item.TotalQuantity)
 
             </td>
-            <br>
+            <br />
             <td>
                 <strong> Tổng giá tiền</strong>
 
                 @String.Format("{0:N0}", item.TotalPrice) đ
             </td>
+            <br />
+            <td>
+                <strong> Phí vận chuyển</strong>
 
+                @(item.Order.ShippingFee == 0 ? "Miễn phí" : String.Format("{0:N0} đ", item.Order.ShippingFee))
+            </td>
+            <br />
+            <td>
+                <strong> Tổng cộng</strong>
+
+                @String.Format("{0:N0}",item.TotalPrice + item.Order.ShippingFee) đ
+            </td>
         </tr>
     }
 
@@ -93,7 +104,7 @@
 </div>
 
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-@*<script type="text/javascript" src="~/Content/admin/js/printThis.js"></script>*@
+
 <script type="text/javascript" src="~/Assets/Admin/js/printThis.js"></script>
 
 <script>
